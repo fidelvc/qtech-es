@@ -156,6 +156,9 @@ hr {
 }
 
 
+/* ------------ Forms ------------- */
+
+
 input {
   padding: 0.5em 0.75rem;
   border-radius: 0.25rem;
@@ -183,12 +186,15 @@ textarea .input {
   resize: vertical;
 }
 
+/* ------------ Layout ------------- */
+
 
 .page {
   margin: 0;
   padding: 0.5em 0;
   height: 100dvh;
   background-color: #f9f9f9;
+  background-image: grandient(45deg, #f9f9f9 25%, transparent 25%), gradient(-45deg, #f9f9f9 25%, transparent 25%), gradient(45deg, transparent 75%, #f9f9f9 75%), gradient(-45deg, transparent 75%, #f9f9f9 75%);
 }
 
 .grid-page {
