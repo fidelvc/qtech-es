@@ -2,33 +2,50 @@
 <html lang="es-ES">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <meta name="robots" content="index, follow">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Fidel VC">
     <meta name="copyright" content="2026 Todos los derechos reservados">
-    <title>Qtech servicio técnico de aparatología estética</title>
+
+    <title>Qtech — Servicio técnico de aparatología estética</title>
     <meta name="description"
-    content="Servicio técnico dedicado al soporte y mantenimiento de aparatología estética multi-marca. ">
-    <meta name="keywords" content="Servicio técnico IPL, Reparación de diodo láser, Revisión de EMSculpt">
-    <link rel="stylesheet" href="./style.css">
-    
-    <base href="/">
-    <script module src="js/main.js"></script>
-    
+        content="Servicio técnico de soporte y mantenimiento de aparatología estética multi-marca: IPL, láser de diodo y EMSculpt.">
+
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="preload" href="./assets/fonts/Rubik-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="./css/global.css">
+
+    <script type="module" src="./js/main.js"></script>
 </head>
 
 <body>
-    <div class="page layout">
-        <main id="content" class="main">
-            <h1>Qtech servicio técnico de aparatología estética</h1>
-            <p>Bienvenido a Qtech, tu servicio técnico de aparatología estética de confianza.</p>
-        </main>
-        <nav id="index-content">
-        </nav>
+    <div class="page">
+        <header class="cabecera-sitio ancho">
+            <a href="#/"><span class="marca">Qtech</span></a>
+            <span>Servicio técnico de aparatología estética</span>
+        </header>
 
+        <main class="ancho">
+            <q-app-view></q-app-view>
+        </main>
+
+        <footer class="pie-sitio ancho">
+            <span>Qtech</span>
+            <a href="mailto:info@qtech.es">info@qtech.es</a>
+            <span>Lunes a viernes, 9:00 – 18:00</span>
+            <small>© 2026 Qtech · Todos los derechos reservados</small>
+        </footer>
     </div>
+
+    <noscript>
+        <h1>Qtech</h1>
+        <p>
+            Esta página necesita JavaScript. Para consultas:
+            <a href="mailto:info@qtech.es">info@qtech.es</a>
+        </p>
+    </noscript>
 </body>
 
 </html>
