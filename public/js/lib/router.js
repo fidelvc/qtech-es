@@ -1,104 +1,142 @@
-const rutas = new Map([
+/* Route paths stay in Spanish (user-facing URLs); element tags are code. */
+const routes = new Map([
   ["/", "home-view"],
-  ["/servicios", "servicios-view"],
-  ["/productos", "productos-view"],
-  ["/contacto", "contacto-view"],
+  ["/servicios", "services-view"],
+  ["/productos", "products-view"],
+  ["/contacto", "contact-view"],
 ]);
 
-const titulos = {
-  "/": "Servicio técnico de aparatología estética",
+const titles = {
+  "/": "Servicio técnico multimarca de aparatología estética",
   "/servicios": "Servicios",
   "/productos": "Productos",
   "/contacto": "Contacto",
 };
 
-const oyentes = new Set();
-
-function normalizar() {
-  const bruto = location.hash.replace(/^#\/?/, "");
-  const limpio = bruto.replace(/^\/+|\/+$/g, "");
-  return limpio === "" ? "/" : `/${limpio}`;
+function normalize() {
+  const raw = location.hash.replace(/^#\/?/, "");
+  const clean = raw.replace(/^\/+|\/+$/g, "");
+  return clean === "" ? "/" : `/${clean}`;
 }
 
-const soportaTransiciones = () =>
+const supportsTransitions = () =>
   typeof document.startViewTransition === "function" &&
   !matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/**
- * Busca el primer <h1> aunque viva varios shadow roots más adentro.
- * `ShadowRoot.querySelector` no cruza shadow roots anidados, así que hay que bajar a mano.
- */function primerH1(nodo) {
-  const raiz = nodo?.shadowRoot;
-  if (!raiz) return null;
-
-  const directo = raiz.querySelector("h1");
-  if (directo) return directo;
-
-  for (const hijo of raiz.querySelectorAll("*")) {
-    const encontrado = primerH1(hijo);
-    if (encontrado) return encontrado;
+function firstH1(node) {
+  const root = node?.shadowRoot;
+  if (!root) return null;
+  const direct = root.querySelector("h1");
+  if (direct) return direct;
+  for (const child of root.querySelectorAll("*")) {
+    const found = firstH1(child);
+    if (found) return found;
   }
-
   return null;
 }
 
-export const router = {
-  get actual() {
-    return normalizar();
-  },
+export class Router {
+  #routes = routes;
+  #titles = titles;
+  #outlet = null;
+  #listeners = new Set();
+  #token = 0;
+
+  get current() {
+    return normalize();
+  }
 
   subscribe(fn) {
-    oyentes.add(fn);
-    return () => oyentes.delete(fn);
-  },
+    this.#listeners.add(fn);
+    return () => this.#listeners.delete(fn);
+  }
 
-  navigate(destino) {
-    const ir = () => {
-      location.hash = destino;
+  navigate(destination) {
+    const go = () => {
+      location.hash = destination;
     };
-    if (soportaTransiciones()) document.startViewTransition(ir);
-    else ir();
-  },
+    if (supportsTransitions()) document.startViewTransition(go);
+    else go();
+  }
 
-  start(outlet) {
-    const pintar = () => {
-      const ruta = normalizar();
-      const tag = rutas.get(ruta);
+  async start(outlet) {
+    this.#outlet = outlet;
 
-      outlet.textContent = "";
-
-      if (!tag) {
-        const aviso = document.createElement("p");
-        aviso.textContent = "Página no encontrada.";
-        outlet.append(aviso);
-      } else {
-        outlet.append(document.createElement(tag));
-        document.title = `${titulos[ruta]} · Qtech`;
-
-        // Mueve el foco al <h1> para que quien navega con teclado o lector
-        // de pantalla no se quede en el punto de partida del documento.
-        queueMicrotask(() => {
-          primerH1(outlet.firstElementChild)?.focus();
-          window.scrollTo({ top: 0, behavior: "instant" });
-        });
-      }
-
-      for (const fn of oyentes) fn({ ruta, tag });
-    };
-
-    addEventListener("hashchange", pintar);
-
-    addEventListener("click", (evento) => {
-      // Los enlaces llegan por slots y shadow roots, así que `target` puede
-      // venir retargeteado: se usa composedPath() para el elemento real.
-      const origen = evento.composedPath()[0];
-      const enlace = origen?.closest?.('a[href^="#/"]');
-      if (!enlace || evento.metaKey || evento.ctrlKey || evento.shiftKey) return;
-      if (enlace.getAttribute("href") === normalizar()) return;
-      evento.preventDefault();
-      this.navigate(enlace.getAttribute("href"));
+    addEventListener("hashchange", () => {
+      this.#render();
     });
 
-    pintar();
-  },
-};
+    addEventListener("click", (event) => {
+      const source = event.composedPath()[0];
+      const link = source?.closest?.('a[href^="#/"]');
+      if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
+      if (link.getAttribute("href") === normalize()) return;
+      event.preventDefault();
+      this.navigate(link.getAttribute("href"));
+    });
+
+    await this.#render();
+  }
+
+  async #render() {
+    const myToken = ++this.#token;
+    const route = normalize();
+    const tag = this.#routes.get(route);
+
+    if (!this.#outlet) return;
+
+    this.#outlet.setAttribute("aria-busy", "true");
+    this.#outlet.replaceChildren(this.#loading());
+
+    if (!tag) {
+      await Promise.resolve();
+      if (myToken !== this.#token) return;
+      this.#outlet.replaceChildren(this.#notFound());
+    } else {
+      await customElements.whenDefined(tag);
+      if (myToken !== this.#token) return;
+      this.#outlet.replaceChildren(document.createElement(tag));
+      document.title = `${this.#titles[route] ?? "Qtech"} · Qtech`;
+
+      queueMicrotask(() => {
+        if (myToken !== this.#token) return;
+        firstH1(this.#outlet.firstElementChild)?.focus();
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
+    }
+
+    if (myToken !== this.#token) return;
+    this.#outlet.removeAttribute("aria-busy");
+
+    for (const fn of this.#listeners) fn({ route, tag });
+  }
+
+  #loading() {
+    const paragraph = document.createElement("p");
+    paragraph.className = "loading";
+    paragraph.setAttribute("role", "status");
+    paragraph.setAttribute("aria-live", "polite");
+    paragraph.textContent = "Cargando...";
+    return paragraph;
+  }
+
+  #notFound() {
+    const section = document.createElement("section");
+    section.className = "not-found";
+
+    const heading = document.createElement("h1");
+    heading.textContent = "Página no encontrada";
+
+    const text = document.createElement("p");
+    text.textContent = "La ruta que buscas no existe.";
+
+    const link = document.createElement("a");
+    link.href = "#/";
+    link.textContent = "Volver al inicio";
+
+    section.append(heading, text, link);
+    return section;
+  }
+}
+
+export const router = new Router();

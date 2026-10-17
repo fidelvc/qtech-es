@@ -1,0 +1,35 @@
+/* Composition primitives shared by the light DOM and every shadow root.
+   Keep this file free of `@layer`: cascade layers do not cross shadow
+   boundaries, so components adopt it directly as a constructed stylesheet.
+
+   Breakpoints (mobile-first): mobile < 30rem, tablet >= 48rem, desktop >= 64rem. */
+
+/* Vertical stack. */
+.stack {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+/* Horizontal group that wraps (nav, filter chips, actions). */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Responsive card grid: explicit columns per breakpoint, no 12-column grid. */
+.grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+
+  @media (width >= 30rem) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (width >= 64rem) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

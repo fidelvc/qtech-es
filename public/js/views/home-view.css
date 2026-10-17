@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+
+h2 {
+  font-size: var(--font-size-step-2);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.stack {
+  margin-block: var(--space-6);
+
+  > p {
+    color: var(--color-text-muted);
+  }
+
+  > p a {
+    font-weight: 600;
+  }
+}

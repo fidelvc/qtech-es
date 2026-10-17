@@ -1,37 +1,13 @@
-import { Elemento } from "../lib/elemento.js";
+import { BaseElement } from "../lib/element.js";
 import { define } from "../lib/define.js";
+import { loadStyles } from "../lib/css.js";
 
 const template = document.createElement("template");
 template.innerHTML = `<slot></slot>`;
 
-const styles = new CSSStyleSheet();
-styles.replaceSync(`
-  :host {
-    display: grid;
-    gap: var(--space-2);
-    max-inline-size: 46rem;
-  }
+const styles = await loadStyles(new URL("./q-faq.css", import.meta.url));
 
-  summary {
-    padding: var(--space-3) 0;
-    border-block-end: 1px solid var(--color-border);
-    font-weight: 600;
-    cursor: pointer;
-    list-style-position: outside;
-  }
-
-  summary:hover { color: var(--color-accent); }
-
-  ::slotted(details) { padding-block: var(--space-2); }
-
-  ::slotted(p) {
-    padding-block-start: var(--space-2);
-    color: var(--color-text-muted);
-    text-wrap: pretty;
-  }
-`);
-
-class Faq extends Elemento {
+class Faq extends BaseElement {
   static template = template;
   static styles = styles;
 }

@@ -1,14 +1,15 @@
-/* Orden de capas: la primera declarada es la de menor precedencia. */
-@layer reset, theme, base, typography, layout, forms, utilities;
+/* Cascade layers, from lowest to highest precedence. */
+@layer reset, theme, base, typography, layout, forms;
 
-/* Los temas se importan en la capa `theme`. `dark.css` llega después, así que
-   gana cuando el sistema pide modo oscuro. `@import` debe ir antes de cualquier
-   regla: solo se admiten `@charset` y sentencias `@layer` por delante. */
+/* Themes live in the `theme` layer. `dark.css` is imported last, so it wins
+   when the system asks for dark mode. `@import` must precede any rule: only
+   `@charset` and `@layer` statements may come first. */
 @import "./themes/light.css" layer(theme);
 @import "./themes/dark.css" layer(theme) screen and (prefers-color-scheme: dark);
 
-/* El resto de hojas se añaden aquí para que quien abra global.css tenga
-   el mapa completo de la cascada en un solo vistazo. */
+/* Remaining sheets are listed here so global.css is a single map of the
+   cascade in one glance. `primitives.css` is shared with shadow roots. */
+@import "./primitives.css" layer(layout);
 @import "./typography.css" layer(typography);
 @import "./layout.css" layer(layout);
 @import "./forms.css" layer(forms);
@@ -97,6 +98,11 @@
   a {
     color: var(--color-accent);
     text-underline-offset: 0.2em;
+  }
+
+  ::selection {
+    background-color: var(--color-selection);
+    color: var(--color-text);
   }
 
   hr {

@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.contact {
+  margin-block: var(--space-2xl);
+
+  dl {
+    display: grid;
+    gap: var(--space-xs) var(--space-l);
+    grid-template-columns: 1fr;
+    margin: 0;
+
+    @media (width >= 30rem) {
+      grid-template-columns: max-content 1fr;
+    }
+
+    dt {
+      color: var(--color-text-muted);
+      font-weight: 700;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+}
+
+.form-section {
+  display: grid;
+  gap: var(--space-4);
+  max-inline-size: 40rem;
+  margin-block-end: var(--space-6);
+}
+
+.contact-form {
+  display: grid;
+  gap: var(--space-3);
+
+  button {
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+    font-weight: 600;
+
+    &.secondary {
+      background-color: transparent;
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+  }
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  font-weight: 600;
+
+  span {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.form-status {
+  min-block-size: 1.2em;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}

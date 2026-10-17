@@ -1,24 +1,17 @@
-import { Elemento } from "../lib/elemento.js";
+import { BaseElement } from "../lib/element.js";
 import { define } from "../lib/define.js";
+import { loadStyles } from "../lib/css.js";
 
 const template = document.createElement("template");
 template.innerHTML = `<slot></slot>`;
 
-const styles = new CSSStyleSheet();
-styles.replaceSync(`
-  :host { display: block; }
-`);
+const styles = await loadStyles(new URL("./q-app-view.css", import.meta.url));
 
 /**
- * Outlet del router. No sabe de rutas ni de negocio: solo proyecta el
- * light DOM donde la vista activa pinta su contenido.
- *
- * No reenvía eventos `app:*` a mano. Con `bubbles: true` y `composed: true`
- * un evento lanzado dentro del light DOM ya atraviesa el host y sube hasta
- * <body>; reemitirlo aquí además provocaría un bucle, porque el propio
- * listener se volvería a disparar sobre el mismo evento.
+ * Router outlet. It knows nothing about routes or business logic: it only
+ * projects the light DOM where the active view paints its content.
  */
-class AppView extends Elemento {
+class AppView extends BaseElement {
   static template = template;
   static styles = styles;
 }

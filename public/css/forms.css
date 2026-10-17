@@ -13,18 +13,17 @@ textarea {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: var(--color-surface);
+
+  /* `:user-invalid` only triggers after a user interaction,
+     unlike `:invalid`. */
+  &:user-invalid {
+    border-color: var(--color-alert);
+  }
 }
 
 textarea {
   resize: vertical;
   min-block-size: 6rem;
-}
-
-/* `:user-invalid` solo se activa tras una interacción del usuario,
-   a diferencia de `:invalid`. */
-input:user-invalid,
-textarea:user-invalid {
-  border-color: var(--color-alert);
 }
 
 button {

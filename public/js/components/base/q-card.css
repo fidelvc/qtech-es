@@ -1,0 +1,20 @@
+:host { display: block; block-size: 100%; }
+:host(:hover) { translate: 0 -2px; }
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  block-size: 100%;
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+}
+
+:host(:hover) .card { border-color: var(--color-accent); }
+
+@starting-style {
+  :host { opacity: 0; translate: 0 8px; }
+}

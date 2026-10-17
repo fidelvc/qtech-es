@@ -1,0 +1,48 @@
+:host {
+  display: block;
+}
+
+.hero {
+  display: grid;
+  gap: var(--space-4);
+  max-inline-size: 52rem;
+  padding-block: var(--space-5) var(--space-6);
+}
+
+h1 {
+  font-size: var(--font-size-step-3);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.intro {
+  max-inline-size: 40rem;
+  font-size: var(--font-size-step-1);
+  color: var(--color-text-muted);
+}
+
+.cluster {
+  margin-block-start: var(--space-2);
+}
+
+::slotted(a) {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+}
+
+::slotted(a.secondary) {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}

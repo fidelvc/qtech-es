@@ -1,82 +1,106 @@
+/* Site shell: header, main, footer and the page container.
+   Breakpoints (mobile-first): mobile < 30rem, tablet >= 48rem, desktop >= 64rem. */
+
 .page {
   display: grid;
   grid-template-rows: auto 1fr auto;
+  grid-template-areas: "header" "main" "footer";
   min-block-size: 100dvh;
+
+  > .site-header {
+    grid-area: header;
+  }
+
+  > main {
+    grid-area: main;
+  }
+
+  > .site-footer {
+    grid-area: footer;
+  }
 }
 
-main {
-  padding: var(--space-5) var(--space-4) var(--space-6);
-}
+/* Centered content column. The gutter grows on wider screens. */
+.container {
+  --gutter: var(--space-4);
+  --max-width: 70rem;
 
-.ancho {
-  max-inline-size: 70rem;
+  @media (width >= 48rem) {
+    --gutter: var(--space-5);
+  }
+
+  inline-size: min(100% - 2 * var(--gutter), var(--max-width));
   margin-inline: auto;
 }
 
-.bloque {
-  display: grid;
-  gap: var(--space-4);
-  margin-block: var(--space-6);
+main {
+  padding-block: var(--space-5) var(--space-6);
 }
 
-.grid-2,
-.grid-3 {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-}
-
-.acciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.boton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid transparent;
+.skip-link {
+  position: absolute;
+  inset-block-start: -100%;
+  inset-inline-start: var(--space-3);
+  z-index: 100;
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  text-decoration: none;
-  font-weight: 600;
   background-color: var(--color-accent);
   color: var(--color-accent-contrast);
-}
-
-.boton.secundario {
-  background-color: transparent;
-  border-color: var(--color-border);
-  color: var(--color-text);
-}
-
-.cabecera-sitio,
-.pie-sitio {
-  padding: var(--space-4);
-  border-block-end: 1px solid var(--color-border);
-}
-
-.cabecera-sitio {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: baseline;
-}
-
-.pie-sitio {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  color: var(--color-text-muted);
-  border-block-end: 0;
-  border-block-start: 1px solid var(--color-border);
-}
-
-.cabecera-sitio a {
+  font-weight: 600;
   text-decoration: none;
+
+  &:focus {
+    inset-block-start: var(--space-3);
+  }
 }
 
-.marca {
-  font-size: var(--font-size-step-1);
+.site-header {
+  display: grid;
+  grid-template-areas: "brand" "nav";
+  gap: var(--space-3) var(--space-5);
+  align-items: center;
+  padding-block: var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+
+  @media (width >= 48rem) {
+    grid-template-areas: "brand nav";
+    grid-template-columns: auto 1fr;
+  }
+
+  > .brand {
+    grid-area: brand;
+    font-size: var(--font-size-step-1);
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  > q-site-nav {
+    grid-area: nav;
+  }
+}
+
+.site-footer {
+  display: grid;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+
+  @media (width >= 48rem) {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    align-items: center;
+  }
+}
+
+/* Router states. */
+.loading {
+  color: var(--color-text-muted);
+}
+
+.not-found {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding-block: var(--space-6);
 }

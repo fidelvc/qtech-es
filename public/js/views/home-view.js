@@ -1,168 +1,104 @@
-import { Elemento } from "../lib/elemento.js";
+import { BaseElement } from "../lib/element.js";
 import { define } from "../lib/define.js";
+import { loadStyles } from "../lib/css.js";
+import { create } from "../lib/fill.js";
 import { site } from "../data/site.js";
 import "./../components/q-hero.js";
-import "./../components/q-service-card.js";
-import "./../components/q-product-card.js";
+import "./../components/q-service-list.js";
+import "./../components/q-product-grid.js";
+import "./../components/q-steps.js";
+import "./../components/q-feature-grid.js";
+import "./../components/q-pricing.js";
 import "./../components/q-faq.js";
 import "./../components/q-cta.js";
-import { crear } from "../lib/rellenar.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
   <q-hero>
-    <p slot="eyebrow">Servicio técnico multi-marca</p>
-    <span slot="titulo">Aparatología estética que vuelve a funcionar</span>
-    <p slot="intro">
-      Mantenimiento y reparación de IPL, láser de diodo y EMSculpt para
-      clínicas y centros de estética.
-    </p>
-    <a slot="accion" href="#/servicios">Ver servicios</a>
-    <a slot="accion" href="#/productos" class="secundario">Repuestos</a>
+    <p slot="eyebrow">Servicio técnico multimarca</p>
+    <span slot="title">Aparatología estética que vuelve a funcionar</span>
+    <p slot="intro" data-hero-intro></p>
+    <a slot="action" href="#/servicios">Ver servicios</a>
+    <a slot="action" href="#/contacto" class="secondary">Pedir presupuesto</a>
   </q-hero>
 
-  <section class="bloque">
+  <section class="stack">
     <h2>Servicios destacados</h2>
-    <div class="grid-3" part="grid"></div>
-    <p><a href="#/servicios">Ver los seis servicios →</a></p>
+    <q-service-list no-filters></q-service-list>
+    <p><a href="#/servicios">Ver todos los servicios →</a></p>
   </section>
 
-  <section class="bloque">
-    <h2>Repuestos más demandados</h2>
-    <div class="grid-3"></div>
+  <section class="stack">
+    <h2>Cómo trabajo</h2>
+    <q-steps></q-steps>
+  </section>
+
+  <section class="stack">
+    <h2>Repuestos destacados</h2>
+    <q-product-grid no-filters></q-product-grid>
     <p><a href="#/productos">Ver catálogo completo →</a></p>
   </section>
 
-  <section class="bloque">
-    <h2>Preguntas frecuentes</h2>
-    <q-faq>
-      <details>
-        <summary>¿Cada cuánto conviene hacer el mantenimiento?</summary>
-        <p>
-          Recomendamos revisión anual en equipos de uso intensivo y semestral en
-          plataformas de IPL compartidas entre varias salas.
-        </p>
-      </details>
-      <details>
-        <summary>¿Trabajáis con marcas de terceros?</summary>
-        <p>
-          Sí, con plataforma de estética médica y centros de estética. Si
-          necesitas una pieza concreta, consúltanos con la referencia.
-        </p>
-      </details>
-      <details>
-        <summary>¿Los repuestos llevan garantía?</summary>
-        <p>
-          Todos los módulos y cartuchos se prueba en banco antes de salir del
-          taller e incluyen garantía de un año.
-        </p>
-      </details>
-      <details>
-        <summary>¿Cómo estimáis el tiempo de la reparación?</summary>
-        <p>
-          El intervalo depende de las horas de uso y del ambiente. Podemos
-          calcularlo si nos indicas tu número de sesiones semanales.
-        </p>
-      </details>
-    </q-faq>
+  <section class="stack">
+    <h2>Garantías</h2>
+    <q-feature-grid data-guarantees></q-feature-grid>
   </section>
 
-  <q-cta>
-    <span slot="titulo">¿Necesitas una valoración?</span>
-    <p slot="texto">
-      Cuéntanos equipo, marca y avería. Respondemos en menos de 24 horas laborables.
-    </p>
-    <a slot="accion" href="mailto:info@qtech.es">Escribir al taller</a>
-  </q-cta>`;
+  <section class="stack">
+    <h2>Logística</h2>
+    <q-feature-grid data-logistics></q-feature-grid>
+  </section>
 
-const styles = new CSSStyleSheet();
-styles.replaceSync(`
-  :host { display: block; }
+  <section class="stack">
+    <h2>Tarifas de mano de obra</h2>
+    <q-pricing></q-pricing>
+  </section>
 
-  h2 {
-    font-size: var(--font-size-step-2);
-    line-height: 1.2;
-    text-wrap: balance;
-  }
+  <section class="stack">
+    <h2>Preguntas frecuentes</h2>
+    <q-faq></q-faq>
+  </section>
 
-  .bloque {
-    display: grid;
-    gap: var(--space-4);
-    margin-block: var(--space-6);
-  }
+  <q-cta></q-cta>`;
 
-  .grid-3 {
-    display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
+const primitives = await loadStyles(new URL("../../css/primitives.css", import.meta.url));
+const styles = await loadStyles(new URL("./home-view.css", import.meta.url));
 
-  .bloque > p { color: var(--color-text-muted); }
-
-  .bloque > p a { font-weight: 600; }
-`);
-
-const euros = new Intl.NumberFormat("es-ES", {
-  style: "currency",
-  currency: "EUR",
-  maximumFractionDigits: 0,
-});
-
-class HomeView extends Elemento {
+class HomeView extends BaseElement {
   static template = template;
-  static styles = styles;
+  static styles = [primitives, styles];
 
   connectedCallback() {
     super.connectedCallback();
 
-    // Servicios destacados: reutiliza la misma tarjeta que la página de servicios.
-    const rejillaServicios = this.$('[part="grid"]');
+    this.$("[data-hero-intro]").textContent = site.summary;
 
-    for (const servicio of site.servicios.filter((s) => s.destacado)) {
-      const card = document.createElement("q-service-card");
-      card.destacado = true;
+    const list = this.$("q-service-list");
+    list.services = site.services.filter((service) => service.featured);
 
-      card.append(
-        crear("span", servicio.titulo, { slot: "titulo" }),
-        crear("span", servicio.descripcion, { slot: "descripcion" }),
-      );
+    const grid = this.$("q-product-grid");
+    grid.products = site.products.slice(0, 3);
 
-      // Cada <li> va como hijo directo de la tarjeta: el slot solo proyecta
-      // nodos del light DOM que sean hijos directos del host.
-      if (servicio.marcas.length) {
-        for (const marca of servicio.marcas) {
-          card.append(crear("li", marca, { slot: "marcas" }));
-        }
-      }
+    this.$("q-steps").items = site.process;
+    this.$("[data-guarantees]").items = site.guarantees;
+    this.$("[data-logistics]").items = site.logistics;
+    this.$("q-pricing").items = site.pricing;
 
-      card.append(
-        crear("a", "Solicitar", { slot: "accion", href: "#/contacto" }),
-      );
-
-      rejillaServicios.append(card);
+    const faq = this.$("q-faq");
+    for (const item of site.faqs) {
+      const entry = document.createElement("details");
+      entry.append(create("summary", item.question), create("p", item.answer));
+      faq.append(entry);
     }
 
-    // Repuestos destacados: reutiliza la tarjeta de producto.
-    const rejillaProductos = this.$$(".grid-3")[1];
-
-    for (const producto of site.productos.slice(0, 3)) {
-      const card = document.createElement("q-product-card");
-      card.ref = producto.ref;
-      card.categoria = producto.categoria;
-
-      card.append(
-        crear("span", producto.nombre, { slot: "nombre" }),
-        crear("span", producto.ref, { slot: "ref" }),
-        crear("span", producto.descripcion, { slot: "descripcion" }),
-        crear("span", euros.format(producto.precio), { slot: "precio" }),
-      );
-
-      const boton = crear("button", "Ver ficha", { type: "button" });
-      boton.slot = "accion";
-      card.append(boton);
-
-      rejillaProductos.append(card);
-    }
+    this.$("q-cta").append(
+      create("span", site.cta.title, { slot: "title" }),
+      create("p", site.cta.text, { slot: "text" }),
+      create("a", site.cta.button, {
+        slot: "action",
+        href: `mailto:${site.contact.email}`,
+      }),
+    );
   }
 }
 
