@@ -4,9 +4,8 @@ import { loadStyles } from "../lib/css.js";
 import { create } from "../lib/fill.js";
 
 const template = document.createElement("template");
-template.innerHTML = `<ul class="grid"></ul>`;
+template.innerHTML = `<ul class="card-grid"></ul>`;
 
-const primitives = await loadStyles(new URL("../../css/primitives.css", import.meta.url));
 const styles = await loadStyles(new URL("./q-feature-grid.css", import.meta.url));
 
 /**
@@ -15,7 +14,7 @@ const styles = await loadStyles(new URL("./q-feature-grid.css", import.meta.url)
  */
 class FeatureGrid extends BaseElement {
   static template = template;
-  static styles = [primitives, styles];
+  static styles = styles;
 
   static props = {
     items: { default: [] },
@@ -28,12 +27,12 @@ class FeatureGrid extends BaseElement {
     if (signature === this.#signature) return;
     this.#signature = signature;
 
-    const grid = this.$(".grid");
+    const grid = this.$(".card-grid");
     grid.replaceChildren();
 
     for (const item of this.items) {
       const card = document.createElement("article");
-      card.className = "feature";
+      card.className = "card";
       card.append(create("h3", item.title), create("p", item.description));
 
       const cell = document.createElement("li");

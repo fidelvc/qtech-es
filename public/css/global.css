@@ -8,8 +8,8 @@
 @import "./themes/dark.css" layer(theme) screen and (prefers-color-scheme: dark);
 
 /* Remaining sheets are listed here so global.css is a single map of the
-   cascade in one glance. `primitives.css` is shared with shadow roots. */
-@import "./primitives.css" layer(layout);
+   cascade in one glance. `layout.css` is shared with shadow roots, so it
+   holds both the page shell and the content containers. */
 @import "./typography.css" layer(typography);
 @import "./layout.css" layer(layout);
 @import "./forms.css" layer(forms);

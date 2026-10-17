@@ -5,6 +5,11 @@
 .contact {
   margin-block: var(--space-2xl);
 
+  a {
+    color: var(--color-accent);
+    text-underline-offset: 0.2em;
+  }
+
   dl {
     display: grid;
     gap: var(--space-xs) var(--space-l);

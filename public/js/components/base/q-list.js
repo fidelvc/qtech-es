@@ -4,14 +4,11 @@ import { local } from "../../lib/storage.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
-  <fieldset class="filters cluster" part="filters">
-    <legend class="sr-only"></legend>
-  </fieldset>
+  <div class="filters cluster" part="filters" role="group"></div>
   <p class="count" role="status" aria-live="polite"></p>
-  <ul class="grid" part="grid"></ul>
+  <ul class="card-grid" part="grid"></ul>
 `;
 
-const primitives = await loadStyles(new URL("../../../css/primitives.css", import.meta.url));
 const styles = await loadStyles(new URL("./q-list.css", import.meta.url));
 
 /**
@@ -21,7 +18,7 @@ const styles = await loadStyles(new URL("./q-list.css", import.meta.url));
  */
 export class ListBase extends BaseElement {
   static template = template;
-  static styles = [primitives, styles];
+  static styles = styles;
   static noun = "elemento";
   static filterLabel = "Filtrar";
 
@@ -52,17 +49,23 @@ export class ListBase extends BaseElement {
 
     super.connectedCallback();
 
-    // Radios live inside the shadow root; `change` is not composed by
-    // default, so it is listened for on the shadow root.
-    this.shadowRoot.addEventListener("change", (event) => {
-      if (event.target.name !== "filter") return;
-      this.filter = event.target.value;
-      if (!this.noFilters) {
-        local.set(`qtech:filter:${this.tagName.toLowerCase()}`, this.filter);
-      }
-      this.#applyFilter();
-      this.emit(`${this.tagName.toLowerCase()}:filter`, { category: this.filter });
+    // Chips are real buttons inside the shadow root: the group is labelled
+    // with `aria-label` and each chip exposes its state with `aria-pressed`.
+    this.shadowRoot.addEventListener("click", (event) => {
+      const chip = event.target.closest?.(".chip");
+      if (chip) this.#select(chip.dataset.value ?? "");
     });
+  }
+
+  #select(value) {
+    if (value === this.filter) return;
+    this.filter = value;
+    if (!this.noFilters) {
+      local.set(`qtech:filter:${this.tagName.toLowerCase()}`, this.filter);
+    }
+    this.#syncPressed();
+    this.#applyFilter();
+    this.emit(`${this.tagName.toLowerCase()}:filter`, { category: this.filter });
   }
 
   render() {
@@ -76,34 +79,36 @@ export class ListBase extends BaseElement {
   }
 
   #renderFilters() {
-    const fieldset = this.$(".filters");
-    const legend = fieldset?.querySelector("legend");
-    if (!fieldset) return;
+    const group = this.$(".filters");
+    if (!group) return;
 
     const signature = (this.filters ?? []).join("|");
-    if (signature === this.#filtersSignature) return;
-    this.#filtersSignature = signature;
+    if (signature !== this.#filtersSignature) {
+      this.#filtersSignature = signature;
+      group.setAttribute("aria-label", this.constructor.filterLabel);
+      group.replaceChildren();
 
-    if (legend) legend.textContent = this.constructor.filterLabel;
+      for (const value of ["", ...(this.filters ?? [])]) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip";
+        chip.dataset.value = value;
+        chip.textContent = value === "" ? "Todas" : value;
+        group.append(chip);
+      }
+    }
 
-    for (const chip of fieldset.querySelectorAll(".chip")) chip.remove();
+    this.#syncPressed();
+  }
 
-    const options = ["", ...(this.filters ?? [])];
-    for (const value of options) {
-      const label = document.createElement("label");
-      label.className = "chip";
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = "filter";
-      input.value = value;
-      if (value === this.filter) input.checked = true;
-      label.append(input, document.createTextNode(value === "" ? " Todas" : ` ${value}`));
-      fieldset.append(label);
+  #syncPressed() {
+    for (const chip of this.$$(".filters .chip")) {
+      chip.setAttribute("aria-pressed", String((chip.dataset.value ?? "") === this.filter));
     }
   }
 
   #buildItems() {
-    const grid = this.$(".grid");
+    const grid = this.$(".card-grid");
     if (!grid) return;
     grid.replaceChildren();
     const fragment = document.createDocumentFragment();
@@ -114,7 +119,7 @@ export class ListBase extends BaseElement {
   }
 
   #applyFilter() {
-    const items = this.$$(".grid > li");
+    const items = this.$$(".card-grid > li");
     let visible = 0;
     for (const li of items) {
       const match = !this.filter || li.dataset.category === this.filter;

@@ -41,6 +41,7 @@ footer {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: transparent;
+  color: var(--color-text);
   font-size: 0.875rem;
 
   &:hover {

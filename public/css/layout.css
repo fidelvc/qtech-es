@@ -1,5 +1,58 @@
-/* Site shell: header, main, footer and the page container.
-   Breakpoints (mobile-first): mobile < 30rem, tablet >= 48rem, desktop >= 64rem. */
+/* Universal layout: the reset, the page shell and the content containers
+   (sections, cards, grids). Shared by the light DOM and every shadow root.
+
+   Keep this file free of `@layer`: cascade layers do not cross shadow
+   boundaries, so `BaseElement` adopts it directly as a constructed
+   stylesheet. That is what makes the layout universal: a component can build
+   its structure with the same vocabulary (`.section`, `.card`, `.card-grid`)
+   no matter where it lives.
+
+   Breakpoints (mobile-first):
+     mobile       < 30rem
+     large mobile >= 30rem
+     tablet       >= 48rem
+     desktop      >= 64rem */
+
+/* -------------------------------------------------------------------------- */
+/* Reset that must also reach shadow roots. The document reset in `global.css` */
+/* cannot cross the boundary, so it is repeated here.                          */
+/* -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul[class],
+ol[class] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* NOTE: link colours are NOT set here. A rule in an outer shadow tree wins
+   over a component's `::slotted()` styles for projected content, so a global
+   `a` colour would clobber the hero/CTA buttons. Views set their own link
+   colour, and components style their slotted anchors. */
+
+/* -------------------------------------------------------------------------- */
+/* Page shell                                                                  */
+/* -------------------------------------------------------------------------- */
 
 .page {
   display: grid;
@@ -37,12 +90,18 @@ main {
   padding-block: var(--space-5) var(--space-6);
 }
 
+/* Skip link: hidden while it stays in the normal flow, so it needs neither
+   `position` nor `z-index`. On focus it expands in place and pushes the page
+   down. */
 .skip-link {
-  position: absolute;
-  inset-block-start: -100%;
-  inset-inline-start: var(--space-3);
-  z-index: 100;
-  padding: var(--space-2) var(--space-3);
+  display: block;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
   border-radius: var(--radius-sm);
   background-color: var(--color-accent);
   color: var(--color-accent-contrast);
@@ -50,21 +109,29 @@ main {
   text-decoration: none;
 
   &:focus {
-    inset-block-start: var(--space-3);
+    inline-size: max-content;
+    block-size: auto;
+    margin: 0;
+    padding: var(--space-2) var(--space-3);
+    overflow: visible;
+    clip-path: none;
   }
 }
 
+/* Brand on the left and the nav (hamburger on mobile) on the right, same
+   row. When the mobile menu opens, the nav grows taller and pushes `main`
+   down: it is not an overlay, so no `position`/`z-index` is needed. */
 .site-header {
   display: grid;
-  grid-template-areas: "brand" "nav";
+  grid-template-areas: "brand nav";
+  grid-template-columns: auto 1fr;
   gap: var(--space-3) var(--space-5);
-  align-items: center;
+  align-items: start;
   padding-block: var(--space-3);
   border-block-end: 1px solid var(--color-border);
 
   @media (width >= 48rem) {
-    grid-template-areas: "brand nav";
-    grid-template-columns: auto 1fr;
+    align-items: center;
   }
 
   > .brand {
@@ -103,4 +170,80 @@ main {
   gap: var(--space-3);
   justify-items: start;
   padding-block: var(--space-6);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Content containers                                                         */
+/* -------------------------------------------------------------------------- */
+
+/* Vertical stack. */
+.stack {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+/* Horizontal group that wraps (nav, filter chips, actions). */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Content section: vertical rhythm plus an optional title/action row. */
+.section {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  margin-block: var(--space-6);
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+
+  a {
+    color: var(--color-accent);
+    font-weight: 600;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* Responsive card grid: explicit columns per breakpoint, no 12-column grid.
+   Items stretch to equal height within each row. */
+.card-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+
+  @media (width >= 30rem) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (width >= 64rem) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  > * {
+    min-inline-size: 0;
+  }
+}
+
+/* Card surface shared by every card-like component. `box-sizing` comes from
+   the reset above, so the padding and border stay inside the grid cell and
+   the card does not overflow its row. */
+.card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  block-size: 100%;
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
 }

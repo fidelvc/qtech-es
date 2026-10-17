@@ -11,12 +11,11 @@ template.innerHTML = `
     <div class="cluster"><slot name="action"></slot></div>
   </section>`;
 
-const primitives = await loadStyles(new URL("../../css/primitives.css", import.meta.url));
 const styles = await loadStyles(new URL("./q-hero.css", import.meta.url));
 
 class Hero extends BaseElement {
   static template = template;
-  static styles = [primitives, styles];
+  static styles = styles;
 }
 
 define("q-hero", Hero);

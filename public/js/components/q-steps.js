@@ -6,7 +6,6 @@ import { create } from "../lib/fill.js";
 const template = document.createElement("template");
 template.innerHTML = `<ol class="steps"></ol>`;
 
-const primitives = await loadStyles(new URL("../../css/primitives.css", import.meta.url));
 const styles = await loadStyles(new URL("./q-steps.css", import.meta.url));
 
 /**
@@ -15,7 +14,7 @@ const styles = await loadStyles(new URL("./q-steps.css", import.meta.url));
  */
 class Steps extends BaseElement {
   static template = template;
-  static styles = [primitives, styles];
+  static styles = styles;
 
   static props = {
     items: { default: [] },

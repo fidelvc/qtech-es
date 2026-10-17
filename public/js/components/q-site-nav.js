@@ -5,19 +5,48 @@ import { site } from "../data/site.js";
 import { router } from "../lib/router.js";
 
 const template = document.createElement("template");
-template.innerHTML = `<nav aria-label="Principal"><ul class="list"></ul></nav>`;
+template.innerHTML = `
+  <nav aria-label="Principal">
+    <button class="toggle" type="button" aria-label="Menú" aria-expanded="false" aria-controls="site-menu">
+      <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <ul id="site-menu" class="list" part="menu"></ul>
+  </nav>`;
 
 const styles = await loadStyles(new URL("./q-site-nav.css", import.meta.url));
 
+/**
+ * Main navigation. On mobile it collapses behind a hamburger button and the
+ * menu expands in the normal flow (no overlay, so no `position`/`z-index`).
+ */
 class SiteNav extends BaseElement {
   static template = template;
   static styles = styles;
 
   #unsubscribe = null;
+  #wired = false;
+  #open = false;
 
   connectedCallback() {
     super.connectedCallback();
-    this.#unsubscribe = router.subscribe(() => this.render());
+
+    if (!this.#wired) {
+      this.#wired = true;
+
+      this.$(".toggle")?.addEventListener("click", () => this.#setOpen(!this.#open));
+
+      this.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || !this.#open) return;
+        this.#setOpen(false);
+        this.$(".toggle")?.focus();
+      });
+    }
+
+    this.#unsubscribe?.();
+    this.#unsubscribe = router.subscribe(() => {
+      this.#setOpen(false);
+      this.render();
+    });
   }
 
   disconnectedCallback() {
@@ -38,6 +67,12 @@ class SiteNav extends BaseElement {
       li.append(link);
       list.append(li);
     }
+  }
+
+  #setOpen(open) {
+    this.#open = open;
+    this.$("nav")?.toggleAttribute("data-open", open);
+    this.$(".toggle")?.setAttribute("aria-expanded", String(open));
   }
 }
 

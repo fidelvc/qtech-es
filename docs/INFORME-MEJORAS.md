@@ -43,10 +43,9 @@ public/
   index.html
   css/
     global.css
-    primitives.css       (NUEVO: .stack / .cluster / .grid compartidos)
+    layout.css           (reset + shell + contenedores: .section / .card / .card-grid)
     forms.css
     typography.css
-    layout.css           (shell: .page / .site-header / main / .site-footer)
     themes/
       light.css          (paleta ampliada, modo claro)
       dark.css           (paleta ampliada, modo oscuro vía prefers-color-scheme)
@@ -253,7 +252,6 @@ Pruebas sugeridas:
 ## 6. Archivos creados / modificados
 
 Creados:
-- `public/css/primitives.css`
 - `public/js/lib/storage.js`
 - `public/js/lib/css.js`
 - `public/js/lib/seo.js`
@@ -341,22 +339,25 @@ en **español**.
 
 - **Breakpoints** (mobile-first, documentados como comentario): móvil base, móvil
   grande `≥ 30rem`, tablet `≥ 48rem`, PC `≥ 64rem`.
-- **`css/primitives.css`** (sin `@layer`, para poder adoptarse en shadow roots):
+- **`css/layout.css`** (sin `@layer`, para poder adoptarse en shadow roots) reúne
+  en un solo sitio el reset universal, el shell de página y los contenedores de
+  contenido:
   - `.stack` — apilado vertical.
   - `.cluster` — fila que envuelve (nav, chips, acciones); flex a propósito, porque
     Grid no auto-envuelve filas.
-  - `.grid` — rejilla de tarjetas con **columnas explícitas** `1 → 2 → 3`, sin usar
-    la clásica división de 12 columnas.
-- **`css/layout.css`**: shell con **áreas con nombre**:
-  - `.page` → `grid-template-areas: "header" "main" "footer"` + `grid-template-rows: auto 1fr auto`.
-  - `.site-header` → `"brand" "nav"`, que pasa a `"brand nav"` en `≥ 48rem`.
-  - `.container` (antes `.ancho`), `.site-footer`, `.skip-link`, y los estados del
-    router `.loading` / `.not-found`.
+  - `.section` / `.section-head` — sección de contenido y fila de título + acción.
+  - `.card-grid` — rejilla de tarjetas con **columnas explícitas** `1 → 2 → 3`, sin
+    usar la clásica división de 12 columnas.
+  - `.card` — superficie de tarjeta compartida por todos los componentes tipo card.
+  - Shell con **áreas con nombre**: `.page` → `grid-template-areas: "header" "main"
+    "footer"` + `grid-template-rows: auto 1fr auto`; `.site-header` → `"brand"
+    "nav"`, que pasa a `"brand nav"` en `≥ 48rem`; `.container` (antes `.ancho`),
+    `.site-footer`, `.skip-link`, y los estados del router `.loading` / `.not-found`.
 - **Nesting nativo** en todas las hojas (`> .brand`, `&:hover`, `@media` anidadas).
 - Se eliminó el **código muerto** (`.grid-2`, `.grid-3`, `.boton`) y la
-  **duplicación** de `.bloque`/`.acciones`: ahora hay una sola primitiva compartida
-  entre el light DOM y los shadow roots (vía `adoptedStyleSheets`), y `forms.css`
-  se reutiliza dentro de `contact-view`.
+  **duplicación** de `.bloque`/`.acciones`: ahora hay una sola hoja de layout
+  compartida entre el light DOM y los shadow roots (vía `adoptedStyleSheets`), y
+  `forms.css` se reutiliza dentro de `contact-view`.
 - **Verificación** en Chrome headless (390, 780 y 1280 px): las 4 rutas + 404
   renderizan sin errores de consola; el header usa `grid-template-areas`
   correctamente según el ancho; `.grid`, `q-steps` y `q-feature-grid` pasan de 1 a
@@ -441,3 +442,128 @@ la 404:
 - JSON-LD con dirección estructurada y `areaServed`.
 - Layout de 1/2/3 columnas en 390/780/1280 px para `.grid`, `q-steps` y
   `q-feature-grid`.
+
+## 9. Layout universal y paleta sRGB (2026-10-18)
+
+### 9.1 El problema: dos tarjetas que no encajaban
+
+En móvil, al pasar a 2 columnas (`≥ 30rem`) las tarjetas se solapaban con la fila
+siguiente. La causa no era el contenido: el reset `box-sizing: border-box` estaba
+solo en el light DOM (`global.css`) y **no cruza el shadow boundary**. Dentro de
+cada shadow root las tarjetas usaban `content-box`, de modo que con
+`block-size: 100%` + `padding` + `border` medían 50 px más que su celda de grid:
+
+| Componente | Celda (`li`) | Tarjeta interior | Desborde |
+|---|---|---|---|
+| `q-service-card` | 561 px | 611 px | **+50 px** |
+| `q-product-card` | 364 px | 414 px | **+50 px** |
+| `q-feature-grid` | 258 px | 308 px | **+50 px** |
+
+### 9.2 Un solo `layout.css` adoptado en todos los shadow roots
+
+- `css/layout.css` es ahora la única hoja de layout e incluye tres bloques: el
+  **reset** que entra en shadow DOM (`box-sizing`, listas, márgenes), el **shell**
+  de página y los **contenedores de contenido** (`.section`, `.section-head`,
+  `.card`, `.card-grid`, `.stack`, `.cluster`). Se mantiene sin `@layer`, porque
+  las capas no cruzan el shadow boundary.
+- `css/primitives.css` desaparece: su contenido se fusiona en `layout.css`.
+- `BaseElement` (`js/lib/element.js`) carga la hoja una sola vez y la antepone a
+  **todas** las hojas de cada shadow root:
+  `root.adoptedStyleSheets = [...new Set([layoutStyles, ...componentSheets])]`.
+  Así cualquier componente, presente o futuro, hereda el mismo layout sin
+  importarlo a mano; se eliminaron los 7 imports repetidos de `primitives.css`.
+- `q-card.css` se reduce a comportamiento (`:host`, hover, `@starting-style`); la
+  superficie `.card` vive en `layout.css`. `q-feature-grid` deja de definir su
+  propia tarjeta y usa `.card` + `.card-grid`.
+- Los componentes usan `.card-grid` (antes `.grid`) y comparten el reset
+  `ul[class]`, que elimina los reset de listas repetidos.
+
+### 9.3 Paleta sRGB
+
+Los temas abandonan `oklch` y pasan a **sRGB** (hex / `rgb()`), manteniendo los
+nombres de token. Retoques de contraste aplicados:
+
+| Token | Antes | Ahora |
+|---|---|---|
+| claro `--color-text-subtle` | `#82868e` (3,34:1) | `#6a6e75` (4,69:1) |
+| claro `--color-border` | `#d4d8dd` (1,44:1) | `#c9cdd3` (1,60:1) |
+| oscuro `--color-border` | `#34383f` (1,40:1) | `#3e434b` (1,66:1) |
+
+Las sombras usan `rgb(... / α)` y `--color-selection` usa `color-mix(in srgb, …)`.
+Los tags de `q-service-card` usan `--color-accent-soft` en vez de
+`color-mix(in oklab, …)`.
+
+### 9.4 Aviso: enlaces y `::slotted()`
+
+En contenido proyectado (slotted), las reglas del **árbol externo** ganan a las
+reglas `::slotted()` del componente, **con independencia de la especificidad**.
+Por eso `layout.css` **no** define un color global para `a`: chocaría con los
+botones-enlace de `q-hero`/`q-cta`. Cada vista o componente fija su color
+(`.section-head a`, `.contact a`, `::slotted(a)` en las tarjetas), y los enlaces
+del light DOM heredan el color de `global.css`.
+
+### 9.5 Verificación
+
+- `box-sizing: border-box` y **altura de tarjeta == celda** en 390/480/768/1280 px,
+  sin desbordes.
+- Rejilla de 1/2/3 columnas en 390/480/1280 px.
+- Colores de enlace correctos tanto en views como en slotted (`Solicitar`, botones
+  del hero y del CTA) en claro y oscuro.
+- 4 rutas + 404 sin errores de consola ni peticiones fallidas (ya no existe
+  `primitives.css`).
+- 13 servicios y 14 productos, sin `€` en productos, filtro persistente.
+
+## 10. Sin `position` ni `z-index`, y menú móvil (2026-10-18)
+
+### 10.1 Regla: todo en el flujo normal
+
+El layout **no usa `position: absolute`, `fixed` ni `z-index`**. Todo se resuelve
+con Grid/Flex y con el flujo normal del documento:
+
+| Caso | Antes | Ahora |
+|---|---|---|
+| Skip link | `position: absolute` + `z-index: 100` | En flujo, 1×1 px con `clip-path: inset(50%)`; al enfocar crece y empuja la página |
+| Chips de filtro | `<input type="radio">` oculto con `position: absolute` | `<button>` reales con `aria-pressed` |
+| Grupo de filtros | `<fieldset>` + `<legend class="sr-only">` | `<div role="group" aria-label>`; se elimina `.sr-only` |
+| Menú móvil | — | Panel en flujo: al abrirse empuja `main` hacia abajo |
+
+El skip link oculto fija `padding: 0` (con `box-sizing: border-box`, un padding
+distinto de cero impediría que la caja bajara de 32×16 px); al recibir `:focus`
+recupera padding, tamaño y `clip-path: none`.
+
+Como corolario, los chips dejan de ser radios y pasan a ser botones: se pierde la
+navegación con flechas del grupo de radios (pasan a ser 5 tab stops), algo
+aceptable con solo 4 filtros. El estado sigue persistiendo en `localStorage`.
+
+### 10.2 Cabecera y menú hamburguesa
+
+- `.site-header` usa Grid en una sola fila: `grid-template-areas: "brand nav"` con
+  `grid-template-columns: auto 1fr`; marca a la izquierda y navegación a la
+  derecha. En móvil se alinea arriba (`align-items: start`) y desde `≥ 48rem` se
+  centra.
+- `q-site-nav` añade un `<button class="toggle">` visible solo en móvil, con
+  `aria-label="Menú"`, `aria-expanded` y `aria-controls="site-menu"`. Al pulsarlo
+  conmuta el atributo `data-open` en el `<nav>`; el `<ul>` pasa de
+  `display: none` a `display: grid` y ocupa el ancho de la columna de navegación.
+- No es un overlay: el panel se abre **en el flujo**, así que no necesita
+  `position` ni `z-index` y nunca tapa contenido. En escritorio (`≥ 48rem`) el
+  botón se oculta y la lista vuelve a ser una fila `flex` con `flex-wrap`.
+- El menú se cierra al navegar (suscripción a `router`) y con `Escape`, que
+  devuelve el foco al botón. El estado no se refleja vía `props` porque la
+  reflexión booleana deja el atributo en `"false"` en lugar de eliminarlo; se
+  conmuta manualmente con `toggleAttribute`.
+- Enlaces del menú a ancho completo de su fila para que el objetivo táctil no se
+  limite al texto.
+
+### 10.3 Verificación
+
+- 0 declaraciones `position: absolute|fixed|sticky` y 0 `z-index` en las 43 hojas
+  (globales y adoptadas por los shadow roots), y 0 estilos en línea.
+- Skip link: 1×1 px oculto; al enfocar, 171×42 px con padding y sin `clip-path`.
+- Chips: `role="group"` con `aria-label`, botones con `aria-pressed`, filtro y
+  persistencia correctos (`5 de 13 servicios`).
+- Menú: a 390 px el botón es visible y la lista no; al pulsar, `data-open`,
+  `aria-expanded="true"` y `display: grid`; `Escape` cierra y devuelve el foco;
+  a 768 px el botón se oculta y la lista es `flex`.
+- Cabecera en la misma fila (marca y nav con el mismo `top`), tarjetas sin
+  desbordes en 390/480/1280 px y sin errores de consola.

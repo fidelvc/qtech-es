@@ -1,4 +1,13 @@
+import { loadStyles } from "./css.js";
+
 const toCamel = (value) => value.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+
+/**
+ * Universal layout sheet (reset + sections + cards + page shell). Every shadow
+ * root adopts it, so components share the same structure no matter where they
+ * live. Cascade layers do not cross shadow boundaries, hence the direct adopt.
+ */
+const layoutStyles = await loadStyles(new URL("../../css/layout.css", import.meta.url));
 
 /**
  * Upgrades a subtree so custom element properties can be assigned.
@@ -33,7 +42,7 @@ export class BaseElement extends HTMLElement {
 
     const sheets = this.constructor.styles;
     const list = Array.isArray(sheets) ? sheets : sheets ? [sheets] : [];
-    root.adoptedStyleSheets = list;
+    root.adoptedStyleSheets = [...new Set([layoutStyles, ...list])];
 
     if (this.constructor.template) {
       root.append(this.constructor.template.content.cloneNode(true));

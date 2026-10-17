@@ -22,51 +22,54 @@ template.innerHTML = `
     <a slot="action" href="#/contacto" class="secondary">Pedir presupuesto</a>
   </q-hero>
 
-  <section class="stack">
-    <h2>Servicios destacados</h2>
+  <section class="section">
+    <div class="section-head">
+      <h2>Servicios destacados</h2>
+      <a href="#/servicios">Ver todos los servicios →</a>
+    </div>
     <q-service-list no-filters></q-service-list>
-    <p><a href="#/servicios">Ver todos los servicios →</a></p>
   </section>
 
-  <section class="stack">
+  <section class="section">
     <h2>Cómo trabajo</h2>
     <q-steps></q-steps>
   </section>
 
-  <section class="stack">
-    <h2>Repuestos destacados</h2>
+  <section class="section">
+    <div class="section-head">
+      <h2>Repuestos destacados</h2>
+      <a href="#/productos">Ver catálogo completo →</a>
+    </div>
     <q-product-grid no-filters></q-product-grid>
-    <p><a href="#/productos">Ver catálogo completo →</a></p>
   </section>
 
-  <section class="stack">
+  <section class="section">
     <h2>Garantías</h2>
     <q-feature-grid data-guarantees></q-feature-grid>
   </section>
 
-  <section class="stack">
+  <section class="section">
     <h2>Logística</h2>
     <q-feature-grid data-logistics></q-feature-grid>
   </section>
 
-  <section class="stack">
+  <section class="section">
     <h2>Tarifas de mano de obra</h2>
     <q-pricing></q-pricing>
   </section>
 
-  <section class="stack">
+  <section class="section">
     <h2>Preguntas frecuentes</h2>
     <q-faq></q-faq>
   </section>
 
   <q-cta></q-cta>`;
 
-const primitives = await loadStyles(new URL("../../css/primitives.css", import.meta.url));
 const styles = await loadStyles(new URL("./home-view.css", import.meta.url));
 
 class HomeView extends BaseElement {
   static template = template;
-  static styles = [primitives, styles];
+  static styles = styles;
 
   connectedCallback() {
     super.connectedCallback();

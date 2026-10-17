@@ -61,13 +61,12 @@ template.innerHTML = `
     </form>
   </section>`;
 
-const primitives = await loadStyles(new URL("../../css/primitives.css", import.meta.url));
 const formStyles = await loadStyles(new URL("../../css/forms.css", import.meta.url));
 const styles = await loadStyles(new URL("./contact-view.css", import.meta.url));
 
 class ContactView extends BaseElement {
   static template = template;
-  static styles = [primitives, formStyles, styles];
+  static styles = [formStyles, styles];
 
   connectedCallback() {
     super.connectedCallback();

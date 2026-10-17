@@ -20,19 +20,17 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 ::slotted(li) {
   padding: var(--space-1) var(--space-2);
   border-radius: 999px;
-  background-color: color-mix(in oklab, var(--color-accent) 14%, transparent);
+  background-color: var(--color-accent-soft);
   color: var(--color-accent);
   font-size: 0.875rem;
 }
 
 ::slotted(a) {
+  color: var(--color-accent);
   font-weight: 600;
 }

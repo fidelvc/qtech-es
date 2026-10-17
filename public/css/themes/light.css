@@ -2,41 +2,41 @@
   color-scheme: light;
 
   /* Surfaces */
-  --color-bg: oklch(97% 0.004 106);
-  --color-surface: oklch(100% 0 0);
-  --color-surface-alt: oklch(94% 0.006 106);
-  --color-surface-elevated: oklch(100% 0 0);
-  --color-overlay: oklch(22% 0.015 260 / 0.45);
+  --color-bg: #f5f5f2;
+  --color-surface: #ffffff;
+  --color-surface-alt: #ebebe7;
+  --color-surface-elevated: #ffffff;
+  --color-overlay: rgb(23 27 34 / 0.45);
 
   /* Text */
-  --color-text: oklch(22% 0.015 260);
-  --color-text-muted: oklch(50% 0.012 260);
-  --color-text-subtle: oklch(62% 0.012 260);
-  --color-heading: oklch(18% 0.02 260);
+  --color-text: #171b22;
+  --color-text-muted: #5f636a;
+  --color-text-subtle: #6a6e75;
+  --color-heading: #0c121a;
 
   /* Borders */
-  --color-border: oklch(88% 0.008 260);
-  --color-border-strong: oklch(78% 0.01 260);
+  --color-border: #c9cdd3;
+  --color-border-strong: #b4b8be;
 
   /* Accent (primary) */
-  --color-accent: oklch(45% 0.085 195);
-  --color-accent-hover: oklch(40% 0.09 195);
-  --color-accent-contrast: oklch(98% 0.012 195);
-  --color-accent-soft: oklch(93% 0.04 195);
+  --color-accent: #006364;
+  --color-accent-hover: #005657;
+  --color-accent-contrast: #f0fbfb;
+  --color-accent-soft: #caf1f0;
 
   /* Secondary accent (warm complementary) */
-  --color-accent-2: oklch(62% 0.14 40);
-  --color-accent-2-soft: oklch(94% 0.05 40);
+  --color-accent-2: #cb6440;
+  --color-accent-2-soft: #ffe1d2;
 
   /* Semantic */
-  --color-success: oklch(52% 0.13 150);
-  --color-success-soft: oklch(93% 0.05 150);
-  --color-warning: oklch(70% 0.14 75);
-  --color-warning-soft: oklch(95% 0.05 75);
-  --color-danger: oklch(55% 0.18 25);
-  --color-danger-soft: oklch(94% 0.06 25);
-  --color-info: oklch(55% 0.12 250);
-  --color-info-soft: oklch(94% 0.05 250);
+  --color-success: #1d7d3e;
+  --color-success-soft: #d1f2d7;
+  --color-warning: #d0901e;
+  --color-warning-soft: #ffeaca;
+  --color-danger: #c53637;
+  --color-danger-soft: #ffdcd7;
+  --color-info: #3275b4;
+  --color-info-soft: #d3efff;
 
   /* Compatibility alias */
   --color-alert: var(--color-danger);
@@ -68,10 +68,10 @@
   --font-size-step-3: clamp(2rem, 1.4rem + 3vw, 3.4rem);
 
   /* Shadows */
-  --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.06);
-  --shadow-2: 0 8px 24px oklch(0% 0 0 / 0.08);
-  --shadow-3: 0 16px 40px oklch(0% 0 0 / 0.12);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.08);
+  --shadow-3: 0 16px 40px rgb(0 0 0 / 0.12);
 
   /* Text selection */
-  --color-selection: color-mix(in oklab, var(--color-accent) 25%, transparent);
+  --color-selection: color-mix(in srgb, var(--color-accent) 25%, transparent);
 }

@@ -4,41 +4,41 @@
   color-scheme: dark;
 
   /* Surfaces */
-  --color-bg: oklch(18% 0.012 260);
-  --color-surface: oklch(24% 0.014 260);
-  --color-surface-alt: oklch(28% 0.014 260);
-  --color-surface-elevated: oklch(30% 0.016 260);
-  --color-overlay: oklch(0% 0 0 / 0.6);
+  --color-bg: #0e1217;
+  --color-surface: #1b1f26;
+  --color-surface-alt: #252930;
+  --color-surface-elevated: #292e36;
+  --color-overlay: rgb(0 0 0 / 0.6);
 
   /* Text */
-  --color-text: oklch(95% 0.005 106);
-  --color-text-muted: oklch(72% 0.012 260);
-  --color-text-subtle: oklch(60% 0.012 260);
-  --color-heading: oklch(98% 0.005 106);
+  --color-text: #efefeb;
+  --color-text-muted: #a0a5ac;
+  --color-text-subtle: #7c8088;
+  --color-heading: #f9f9f5;
 
   /* Borders */
-  --color-border: oklch(34% 0.014 260);
-  --color-border-strong: oklch(46% 0.014 260);
+  --color-border: #3e434b;
+  --color-border-strong: #545860;
 
   /* Accent (primary) */
-  --color-accent: oklch(78% 0.11 195);
-  --color-accent-hover: oklch(84% 0.12 195);
-  --color-accent-contrast: oklch(18% 0.03 195);
-  --color-accent-soft: oklch(26% 0.06 195);
+  --color-accent: #4fcdcd;
+  --color-accent-hover: #55e3e3;
+  --color-accent-contrast: #001616;
+  --color-accent-soft: #002c2d;
 
   /* Secondary accent */
-  --color-accent-2: oklch(74% 0.14 40);
-  --color-accent-2-soft: oklch(28% 0.07 40);
+  --color-accent-2: #f48a64;
+  --color-accent-2-soft: #451a0b;
 
   /* Semantic */
-  --color-success: oklch(74% 0.13 150);
-  --color-success-soft: oklch(26% 0.06 150);
-  --color-warning: oklch(80% 0.14 75);
-  --color-warning-soft: oklch(28% 0.07 75);
-  --color-danger: oklch(72% 0.16 25);
-  --color-danger-soft: oklch(28% 0.08 25);
-  --color-info: oklch(76% 0.12 250);
-  --color-info-soft: oklch(28% 0.06 250);
+  --color-success: #69c27e;
+  --color-success-soft: #092c13;
+  --color-warning: #f2af48;
+  --color-warning-soft: #3c2200;
+  --color-danger: #f97770;
+  --color-danger-soft: #491513;
+  --color-info: #73b6fa;
+  --color-info-soft: #0e2a45;
 
   /* Compatibility alias */
   --color-alert: var(--color-danger);
@@ -47,10 +47,10 @@
   --color-focus: var(--color-accent);
 
   /* Shadows */
-  --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.4);
-  --shadow-2: 0 8px 24px oklch(0% 0 0 / 0.5);
-  --shadow-3: 0 16px 40px oklch(0% 0 0 / 0.6);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-3: 0 16px 40px rgb(0 0 0 / 0.6);
 
   /* Text selection */
-  --color-selection: color-mix(in oklab, var(--color-accent) 30%, transparent);
+  --color-selection: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
